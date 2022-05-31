@@ -1,4 +1,6 @@
-MOVES = [[-2, -1], [-2, 1], [2, -1], [2, 1], [-1, -2], [-1, 2], [1, -2], [1, 2]]
+MOVES = [[-2, -1], [-2, 1], [2, -1], [2, 1], [-1, -2], [-1, 2], [1, -2], [1, 2]].freeze
+POSSIBLE_COLUMNS = %w[a b c d e f g h].freeze
+POSSIBLE_ROWS = [1, 2, 3, 4, 5, 6, 7, 8].freeze
 
 class Node
   attr_accessor :children, :field, :parent
@@ -94,15 +96,38 @@ class Knight
     @tree = Tree.new(position, @board)
   end
 
+  def set_start
+    puts 'Pls enter the start coordinates of your knight. (Like a3 or c6)'
+    set_position
+  end
+
+  def set_destination
+    puts 'Pls enter the destination coordinates of your knight. (Like a3 or c6)'
+    set_position
+  end
+
+  def set_position
+    input = '  '
+    input = gets.chomp.reverse.split(//) until POSSIBLE_COLUMNS.include?(input[1].downcase) &&
+                                               POSSIBLE_ROWS.include?(input[0].to_i)
+    input[0] = POSSIBLE_ROWS.index(input[0].to_i)
+    input[1] = POSSIBLE_COLUMNS.index(input[1])
+    input
+  end
+
   def knight_moves(start, destination)
     @position = start
     @tree.root = Node.new(start)
     @tree.build_tree
     shortest_path = @tree.preorder(destination).reverse
     puts "=> You made it in #{shortest_path.length - 1} moves! Here's your path:"
-    shortest_path.each { |field| p field }
+    shortest_path.each do |field|
+      field[1] = POSSIBLE_COLUMNS[field[1]]
+      field[0] += 1
+      p field.reverse
+    end
   end
 end
 
 k = Knight.new
-k.knight_moves([3, 3], [7, 7])
+k.knight_moves(k.set_start, k.set_destination)
